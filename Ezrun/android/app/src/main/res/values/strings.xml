@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EzRun</string>
+    <string name="title_activity_main">SmartRun</string>
+    <string name="package_name">com.tot.smartrun</string>
+    <string name="custom_url_scheme">com.tot.smartrun</string>
+    <string name="YOUR_API_KEY">AIzaSyBAQ1-cvGZH5qi-69wP1QHb5JSmC0b3bwI</string>
+    <string name="server_client_id">1081196773604-6i9vph0udavfglgr7fd34sikp743fcru.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">181460326426991</string>
+    <string name="fb_login_protocol_scheme">fb181460326426991</string>
+</resources>

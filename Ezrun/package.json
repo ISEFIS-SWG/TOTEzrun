@@ -1,0 +1,67 @@
+{
+  "name": "Ezrun",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^1.5.0",
+    "@capacitor/core": "1.5.0",
+    "@ionic-native/file": "^5.22.0",
+    "@ionic-native/file-transfer": "^5.22.0",
+    "@ionic/pwa-elements": "^1.4.2",
+    "@ionic/react": "^4.11.8",
+    "@ionic/react-router": "^4.11.8",
+    "@rdlabo/capacitor-facebook-login": "^2.0.2",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.4.0",
+    "@testing-library/user-event": "^8.0.3",
+    "@types/google-map-react": "^1.1.5",
+    "@types/jest": "^24.0.25",
+    "@types/node": "^12.12.24",
+    "@types/react": "^16.9.17",
+    "@types/react-dom": "^16.9.4",
+    "@types/react-router": "^5.1.4",
+    "@types/react-router-dom": "^5.1.3",
+    "axios": "^0.19.2",
+    "google-map-react": "^1.1.7",
+    "ionicons": "^4.6.3",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-native-image-crop-picker": "^0.28.0",
+    "react-native-image-picker": "^2.2.1",
+    "react-native-router-flux": "^4.2.0",
+    "react-router": "^5.1.2",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.3.0",
+    "react-share": "^4.0.1",
+    "react-social-login-buttons": "^3.0.0",
+    "react-timer-hook": "^2.0.0",
+    "react-transition-group": "^4.3.0",
+    "typescript": "3.7.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "description": "An Ionic project",
+  "devDependencies": {
+    "@capacitor/cli": "1.5.0",
+    "@types/react-transition-group": "^4.2.3"
+  }
+}

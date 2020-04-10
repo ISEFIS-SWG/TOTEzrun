@@ -1,0 +1,25 @@
+.text-center {
+    text-align: center;
+  }
+  .title {
+    font-size: 32px;
+    font-weight: bold;
+  }
+  .title-img {
+    width: 50%;
+    margin: auto;
+  }
+  .login-button {
+    margin-top: 50px;
+  }
+  .box {
+    width: 300px;
+    padding: 40px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    text-align: center;
+
+
+  }

@@ -1,0 +1,19 @@
+{
+  "appId": "com.tot.smartrun",
+  "appName": "Ezrun",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "build",
+  "cordova": {},
+  "plugins": {
+    "GoogleAuth": {
+      "scopes": [
+        "profile",
+        "email"
+      ],
+      "YOUR_API_KEY": "AIzaSyBAQ1-cvGZH5qi-69wP1QHb5JSmC0b3bwI"
+    }
+  }
+
+
+}
