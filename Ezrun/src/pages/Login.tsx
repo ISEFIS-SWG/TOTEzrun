@@ -39,7 +39,8 @@ let LoginCheck = async()=>{
       shareValue.selflogin = selflogin;
       //shareValue.user=logindetail;
      // console.log('rwsult'+shareValue.selflogin[0])
-      shareValue.LoginFrom=1
+      shareValue.LoginFrom=1;
+      shareValue.username = User_Name;
     props.history.push('/tab4')
   }
   })
