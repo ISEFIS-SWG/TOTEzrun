@@ -5,8 +5,10 @@ import GoogleMapReact from 'google-map-react';
 import { RefresherEventDetail } from '@ionic/core';
 import { start } from 'repl';
 import { useStopwatch } from 'react-timer-hook';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonButton,
-  IonCol,IonRow,IonGrid, IonIcon, IonButtons, IonContent, IonLoading, useIonViewDidEnter } from '@ionic/react';
+import {
+  IonPage, IonHeader, IonToolbar, IonTitle, IonButton,
+  IonCol, IonRow, IonGrid, IonIcon, IonButtons, IonContent, IonLoading, useIonViewDidEnter
+} from '@ionic/react';
 import { RouteComponentProps, useHistory } from 'react-router';
 import { strict } from 'assert';
 import shareValue from "./models/share";
@@ -16,11 +18,11 @@ const { Geolocation } = Plugins;
 const Tab4: React.FC<RouteComponentProps> = (props) => {
   const [showLoading, setShowLoading] = useState(false);
   const [positionReady, setPositionReady] = useState(false);
-  const [currentPosition, setCurrentPosition] = useState({ lat: 0, lng: 0, acc: 0, time: 0 });
-  const [startPosition, setStartPosition] = useState({ lat: 0, lng: 0, acc: 0, time: 0 });
-  const [startReady, setStartReady] = useState(true);
-  const [startStatus, setStartStatus] = useState({ time: 0 });
+  const [currentPosition, setCurrentPosition] = useState({ lat: 0, lng: 0, speed: 0 });
+  const [startPosition, setStartPosition] = useState({ lat: 0, lng: 0, time: 0 });
+  const [timeStatus, setTimeStatus] = useState({ stime: 0, ftime: 0 });
   const [totalDistance, setTotalDistance] = useState(0);
+  const [watchID, setWatchID] = useState(0);
 
   const {
     seconds,
@@ -29,176 +31,120 @@ const Tab4: React.FC<RouteComponentProps> = (props) => {
     days,
     start,
     pause,
-
     reset,
   } = useStopwatch({ autoStart: false });
 
-  let onMapLoad = (map: any, mapsAPI: any) => {
-    let directionsService = new mapsAPI.DirectionsService();
-    let directionsRenderer = new mapsAPI.DirectionsRenderer();
-    directionsRenderer.setMap(map)
-    let start = { lat: 9.1106153, lng: 99.3018452 };
-
-    let end = { lat: 6.9506242, lng: 100.41277989999999 };
-
-    var waypts = [7.669402, 100.022582]
-
-    let request = {
-      origin: end,
-      destination: end,
-      waypoints: [
-        {
-          location: "7.0451252, 100.1912893",
-          stopover: true
-        },
-        {
-          location: "7.003344, 100.326394",
-          stopover: true
-        }
-      ],
-      optimizeWaypoints: true,
-      travelMode: 'WALKING'
-
-    };
-
-    directionsService.route(request, function (result: any, status: any) {
-
-      if (status == 'OK') {
-        directionsRenderer.setDirections(result);
-        let route = result.routes[0];
-
-        var totalDist = 0;
-
-        for (let i = 0; i < route.legs.length; i++) {
-          console.log('directionService', route.legs[i].distance.text)
-          totalDist += route.legs[i].distance.value;
-        }
-
-
-        let dis1 = route.legs[route.legs.length - 1].distance.value / 1000; // distance : km.
-        console.log(dis1 + ' km.')
-        let weight = 78 // kg.
-        let cal = weight * dis1 * 1.036
-        console.log(cal.toFixed(2) + " Kcal")
-      }
-    });
-    let trafficLayer = new mapsAPI.TrafficLayer();
-  }
-
   useIonViewDidEnter(() => {
-
-    
-
+    startGetGPS();
   });
 
-
-
+  let position1: any;
   const startGetGPS = async () => {
-    console.log('Getting...startGetGPS');
-    setShowLoading(true);
-    let position1 = await Geolocation.getCurrentPosition();
+    console.log('**** startGetGPS ***');
+    setShowLoading(false)
+    let position1 = await Geolocation.getCurrentPosition().then(success)
+      .catch((error) => {
+        alert('Not found Position:' + error.message);
+      });
+  }
+
+  let success = (position: any) => {
     setShowLoading(false);
     setPositionReady(true);
-    
-    start();
-    setCurrentPosition({
-      lat: position1.coords.latitude,
-      lng: position1.coords.longitude,
-      acc: position1.coords.accuracy,
-      time: position1.timestamp
+    setWatchID(position1);
+    setStartPosition({
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      time: position.timestamp
     });
-
-    if (startReady == true) {
-      setStartStatus({
-        time: position1.timestamp
-      })
-      setStartPosition({
-        lat: position1.coords.latitude,
-        lng: position1.coords.longitude,
-        acc: position1.coords.accuracy,
-        time: position1.timestamp
-      })
-      setStartReady(false);
-    }
-    // let lat = position1.coords.latitude;
-    // let lng = position1.coords.longitude;
-    console.log('Current startGetGPS', startPosition.lat, startPosition.lng);
-    // startWatchGPS();
-    
-  }
-  const getDistance = async () => {
-    console.log('Getting geolocation....getDistance');
-    setShowLoading(true);
-    let position1 = await Geolocation.getCurrentPosition();
-    setShowLoading(false);
-    setPositionReady(true);
     setCurrentPosition({
-      lat: position1.coords.latitude,
-      lng: position1.coords.longitude,
-      acc: position1.coords.accuracy,
-      time: position1.timestamp
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      speed: position.coords.speed
     });
-    let lat = position1.coords.latitude;
-    let lng = position1.coords.longitude;
-
-    let googleMap;
-    if (positionReady) {
-      googleMap = (
-        <GoogleMapReact
-          bootstrapURLKeys={{ key: 'AIzaSyATDm0MlJIxUXoIU56PIOk3aY26XXs6ul0' }}
-          defaultCenter={currentPosition}
-          defaultZoom={15}
-          yesIWantToUseGoogleMapApiInternals
-          onGoogleApiLoaded={({ map, maps }) => { onMapLoad(map, maps) }} >
-        </GoogleMapReact>
-      )
-    }
+    setTotalDistance(0);
   }
-  let watch1;
+  let watch: any;
   let startWatchGPS = () => {
-    console.log('Watching geolocation...startWatchGPS');
-    setShowLoading(true);
-    watch1 = Geolocation.watchPosition({}, (position, error) => {
-      console.log('new position startWatchGPS', position);
-      setShowLoading(false);
-      setPositionReady(true);
+    console.log('*** startWatchGPS **** :');
+    watch = Geolocation.watchPosition({}, (watchsuccess));
+    setWatchID(watch);
+  }
+
+  let position_1 = { lat: 0, lng: 0 }
+  let position_2 = { lat: 0, lng: 0, speed: 0 }
+  let firstwatch = true;
+  let firstcal = true;
+  let sub_distance = 0;
+
+  let watchsuccess = (position: any, error: any) => {
+    setPositionReady(true);
+    if (firstwatch == true) {
       setStartPosition({
-        lat: currentPosition.lat,
-        lng: currentPosition.lng,
-        acc: currentPosition.acc,
-        time: currentPosition.time
-      })
-      setCurrentPosition({
         lat: position.coords.latitude,
         lng: position.coords.longitude,
-        acc: position.coords.accuracy,
         time: position.timestamp
-      })
+      });
+      position_1.lat = position.coords.latitude;
+      position_2.lng = position.coords.longitude;
+      position_2.speed = position.coords.speed;
+      firstwatch = false;
     }
-    );
+    else {
+      position_1.lat = position_2.lat;
+      position_1.lng = position_2.lng;
+    }
+    setCurrentPosition({
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+      speed: position.coords.speed
+    });
+    position_2.lat = position.coords.latitude;
+    position_2.lng = position.coords.longitude;
+    position_2.speed = position.coords.speed;
+
+    console.log('speed : ', position_2.speed);
+
+    if (firstcal == false) {
+      sub_distance = sub_distance + distanceInKmBetweenEarthCoordinates(position_1, position_2);
+    }
+    setTotalDistance(Number(sub_distance.toFixed(2)));
+    firstcal = false;
   }
-   
 
- 
+  let degreesToRadians = (degrees: any) => {
+    return degrees * Math.PI / 180;
+  }
 
+  let distanceInKmBetweenEarthCoordinates = (position1: any, position2: any) => {
+    let Significant = 5;
+    let earthRadiusKm = 6371;
+    let lat1 = Number((position1.lat).toFixed(Significant));
+    let lng1 = Number((position1.lng).toFixed(Significant));
+    let lat2 = Number((position2.lat).toFixed(Significant));
+    let lng2 = Number((position2.lng).toFixed(Significant));
+    console.log('lat1 :', lat1, ' lng1 :', lng1);
+    console.log('lat2 :', lat2, ' lng2 :', lng2);
+    let dLat = degreesToRadians(lat2 - lat1);
+    let dLon = degreesToRadians(lng2 - lng1);
 
-  let findDistance = (lat1: any, lon1: any, lat2: any, lon2: any) => {
-    let R = 6373; // km
-    let dLat = toRad((lat2 - lat1));
-    let dLon = toRad((lon2 - lon1));
+    lat1 = degreesToRadians(lat1);
+    lat2 = degreesToRadians(lat2);
     let a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      toRad(Math.cos(lat1)) * toRad(Math.cos(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
     let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    let d = R * c;
-    function toRad(Value: any) {
-      /** Converts numeric degrees to radians */
-      return Value * Math.PI / 180;
-    }
-    /* ทศนิยม 2 ตำแหน่ง */
-    let d_round_to_2nd = Number(d.toFixed(2));
-    return d_round_to_2nd;
-  };
+    let distancekm = earthRadiusKm * c;
+
+    return Number(distancekm.toFixed(2));
+  }
+
+
+
+  let stopWatchGPS = (watchid: any) => {
+    console.log('watch id :', watchid);
+    let clearwatch = Geolocation.clearWatch(watchid);
+
+  }
 
   /* เพิ่มเลขศูนย์หน้า วัน เดือน เวลา ที่เป็นเลขหลักเดียว */
   let addZero = (i: any) => {
@@ -209,16 +155,14 @@ const Tab4: React.FC<RouteComponentProps> = (props) => {
   }
 
   let getDatetime = (time: any) => {
-
     let myDate = new Date(time);
     let d = addZero(myDate.getDate());
-    let m = addZero(myDate.getMonth());
+    let m = addZero((myDate.getMonth()) + 1);
     let y = myDate.getFullYear();
     let h = addZero(myDate.getHours());
     let min = addZero(myDate.getMinutes());
     let sec = addZero(myDate.getSeconds());
-    let times = d + '-' + m + '-' + y + ' ' + h + ':' + min + ':' + sec
-    console.log('DateTime', times);
+    let times = y + '-' + m + '-' + d + ' ' + h + ':' + min + ':' + sec
     return times;
   };
 
@@ -227,10 +171,7 @@ const Tab4: React.FC<RouteComponentProps> = (props) => {
     let mystartDate = new Date(timestart);
     let mystopDate = new Date(timestop);
     let myDate = new Date(time);
-    // //let d = myDate.getDate();
-    // let m = myDate.getMonth();
-    // let y = myDate.getFullYear();
-    let h = addZero(myDate.getHours())-7;
+    let h = addZero(myDate.getHours()) - 7;
     let min = addZero(myDate.getMinutes());
     let sec = addZero(myDate.getSeconds());
     let times;
@@ -239,11 +180,6 @@ const Tab4: React.FC<RouteComponentProps> = (props) => {
     } else {
       times = h + ':' + min + ':' + sec
     }
-    
-    console.log('Time Start :', mystartDate);
-    console.log('Time Stop :', mystopDate);
-    console.log('Diff Time :', h, ':', min, ':', sec);
-    console.log(times)
     return times;
   };
 
@@ -264,103 +200,92 @@ const Tab4: React.FC<RouteComponentProps> = (props) => {
     console.log(x + " Kcal.")
   }
 
-  let startTextJSX;
-
-  if (positionReady == true) {
-    startTextJSX = <p>{currentPosition.lat},{currentPosition.lng},{currentPosition.time}</p>
-  }
-  else {
-    startTextJSX = <p>กดปุ่มบนขวาเพื่อระบุพิกัดของเครื่อง</p>
-  }
   let stopTextJSX;
-  let distanceTextJSX;
+  let start_time = getDatetime(timeStatus.stime);
+  let current_time = getDatetime(timeStatus.ftime);
+  let duration = durationtime(timeStatus.stime, timeStatus.ftime);
 
-  let starttime = getDatetime(startStatus.time);
-  let stoptime = getDatetime(currentPosition.time);
-  let duration = durationtime(startStatus.time,currentPosition.time);
-  let distance = findDistance(startPosition.lat, startPosition.lng, currentPosition.lat,currentPosition.lng);
-  
-  if (positionReady == true) {
+  // if (positionReady == true) {
+  //   stopTextJSX = <p>
+  //     {/* S_LAT = {startPosition.lat} <br></br>
+  //     LNG = {startPosition.lng} <br></br>
+  //     <br></br>
+  //     C_LAT = {currentPosition.lat} <br></br>
+  //     LNG = {currentPosition.lng} <br></br>
+  //     <br></br> */}
+  //     {/* Start Time = {start_time} <br></br>
+  //     Current Time = {current_time}<br></br> */}
+  //     {totalDistance}
+  //     {/* Duration = {duration}<br></br> */}
+  //     {/* WatchGPS_ID = {watchID} */}
+  //     </p>
+  // }
 
 
-    stopTextJSX = <p>LastPosition = {startPosition.lat}<br></br>
-                    latitude = {startPosition.lng}<br></br>
-                    Time = {starttime}<br></br>
-                    CurrentPosition = {currentPosition.lat}<br></br>
-                    latitude = {currentPosition.lng}<br></br>
-                    timestamp = {stoptime}<br></br>
-                    duration = {duration}</p>
-
-    distanceTextJSX = <p>totalDistance = {distance}</p>
-  } else {
-    stopTextJSX = <p>กดปุ่มบนขวาเพื่อระบุพิกัดของเครื่อง</p>
-  }
-  let googleMap;
-  if (positionReady) {
-    googleMap = (
-      <GoogleMapReact
-        bootstrapURLKeys={{ key: 'AIzaSyATDm0MlJIxUXoIU56PIOk3aY26XXs6ul0' }}
-        defaultCenter={currentPosition}
-        defaultZoom={15}
-        yesIWantToUseGoogleMapApiInternals
-        onGoogleApiLoaded={({ map, maps }) => { onMapLoad(map, maps) }} >
-      </GoogleMapReact>
-    )
-  }
   return (
     <IonPage>
       <IonHeader translucent={true}>
         <IonToolbar>
           <IonTitle>Easy Running</IonTitle>
-          
+
         </IonToolbar>
       </IonHeader>
       <IonContent>
 
-      <IonGrid>
-
-         
-<IonRow  >
-  <IonCol >
-    <div style={{ fontSize: '100px', textAlign: "center" }}>
-      <span>{hours}</span>:<span>{minutes}</span>:<span>{seconds}</span>
-    </div>
-  </IonCol>
-</IonRow>
-<IonRow className="ion-align-self-center">
-
-  <IonCol className="ion-align-self-center"	> <IonButton size="large" color="dark" onClick={startGetGPS}>Start</IonButton>  </IonCol>
-  <IonCol className="ion-align-self-center">   <IonButton size="large" color="dark" onClick={()=>{
-       // startGetGPS();
-
-      let alltime = hours+minutes+seconds;
-       
-        shareValue.duration = alltime;
-    
-        shareValue.startTime = starttime;
-        shareValue.stopTime = stoptime;
-        shareValue.distance = distance;
-        pause();
-      }}>Stop</IonButton>  </IonCol>
-  <IonCol className="ion-align-self-center">   <IonButton size="large" color="dark"  onClick={()=>{props.history.push("/tab2")}}>ส่งผล</IonButton> </IonCol>
-
-</IonRow>
-</IonGrid>
+        <IonGrid>
 
 
+          <IonRow  >
+            <IonCol >
+              <div style={{ fontSize: '100px', textAlign: "center" }}>
+                <span>{hours}</span>:<span>{minutes}</span>:<span>{seconds}</span>
+              </div>
+            </IonCol>
+          </IonRow>
+          <IonRow className="ion-align-self-center">
 
+            <IonCol className="ion-align-self-center"	> <IonButton size="large" color="success" onClick={() => {
+              setTimeStatus({
+                stime: new Date().getTime(),
+                ftime: new Date().getTime()
+              });
+              startWatchGPS();
+              start();
+            }}>Start</IonButton>  </IonCol>
+            <IonCol className="ion-align-self-center">   <IonButton size="large" color="danger" onClick={() => {
+              setTimeStatus({
+                stime: timeStatus.stime,
+                ftime: new Date().getTime()
+              });
+              stopWatchGPS(watchID);
+              pause();
+            }}>Stop</IonButton>  </IonCol>
+            <IonCol className="ion-align-self-center">   <IonButton size="large" color="primary" onClick={() => {
+              let alltime;
+              if (hours == 0) {
+                alltime = String(addZero(minutes) + ':' + addZero(seconds));
+              } else {
+                alltime = String(addZero(hours) +':'+ addZero(minutes) + ':' + addZero(seconds));
+              }
+              shareValue.username = shareValue.username;
+              shareValue.duration = alltime;
+              shareValue.startTime = start_time;
+              shareValue.stopTime = current_time;
+              shareValue.distance = totalDistance;
+              props.history.push("/tab2");
 
-        <body >
-          <div style={{ height: '90vh', width: '100%' }}>
-            {/* {startTextJSX} */}
-            {stopTextJSX}
-            {distanceTextJSX}
-            {/* {positionTextJSX} */}
-            {/* {googleMap}  */}
-            {/* {DistanceTextJSX} */}
-          </div>
-        </body>
-        <IonLoading isOpen={showLoading} message="กำลังขอพิกัด" />
+            }}>ส่งผล</IonButton> </IonCol>
+
+          </IonRow>
+          <IonRow  >
+            <IonCol >
+              <div style={{ fontSize: '30px', color : 'green'}}>
+                <span>Distance {totalDistance}  Km.</span>
+              </div>
+            </IonCol>
+          </IonRow>
+          </IonGrid>
+        {/* <IonLoading isOpen={showLoading} message="กำลังขอพิกัด" /> */}
       </IonContent>
     </IonPage>
   );
