@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonAvatar, IonItem, IonLabel, IonIcon, IonInput, IonFooter, IonButton, IonAlert, IonDatetime } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonAvatar, IonItem, IonLabel, IonIcon, IonInput, IonFooter, IonButton, IonAlert, IonDatetime, IonNote } from '@ionic/react';
 
 import './Tab2.css';
 import { timer } from 'ionicons/icons';
@@ -11,14 +11,8 @@ const Tab2: React.FC<RouteComponentProps> = (props) => {
 
   const [showAlert, setShowAlert] = useState(false);
 
-  let username = "pratya";
-  //let walkRun = "30";
-  // let startTime = "2020-03-30 17:30:07";
-  // let stopTime = "2020-03-30 18:00:08";
-  // let distance = "5";
-  //let username = shareValue.username;
+  let username = shareValue.username;
   let walkRun = shareValue.duration;
-  console.log('walkrun',walkRun);
   let startTime = shareValue.startTime;
   let stopTime = shareValue.stopTime;
   let distance = shareValue.distance;
@@ -29,7 +23,8 @@ const Tab2: React.FC<RouteComponentProps> = (props) => {
     let result = await addActivity(username, walkRun, startTime, stopTime, distance);
      if (result?.data.success) {
       setShowAlert(true);
-      props.history.goBack();
+      props.history.push("/ShowDetailAc");
+      // props.history.goBack();ShowDetailAc
     }
   }
 
@@ -44,23 +39,21 @@ const Tab2: React.FC<RouteComponentProps> = (props) => {
         <IonAvatar className="avatar">
           <img src={shareValue.selflogin.Picture} />
         </IonAvatar>
-        
-          <IonItem lines="none">
-            <IonLabel><h2>เริ่มวิ่งเวลา  {startTime}</h2></IonLabel>
-            
-           
+        <IonItem lines="none">
+            <IonLabel>เริ่มวิ่งเวลา</IonLabel>
+            <IonNote slot = "end" color = "primary">{startTime}</IonNote>
           </IonItem>
           <IonItem lines="none">
-          <IonLabel><h2>สิ้นสุดการวิ่ง  {stopTime}</h2></IonLabel>
-            
+          <IonLabel>สิ้นสุดการวิ่ง</IonLabel>
+          <IonNote slot = "end" color = "primary">{stopTime}</IonNote> 
           </IonItem>
           <IonItem lines="none">
-          <IonLabel><h2>รวมเวลาวิ่ง  {walkRun}</h2></IonLabel>
-            
+          <IonLabel>รวมเวลาวิ่ง</IonLabel>
+          <IonNote slot = "end" color = "primary">{walkRun}</IonNote> 
           </IonItem>
           <IonItem lines="none">
-            <IonLabel><h2>ท่านวิ่งได้ระยะทาง (กิโลเมตร)</h2></IonLabel>
-            <IonInput color="primary" placeholder={distance} ></IonInput>
+            <IonLabel>ท่านวิ่งได้ระยะทาง(กิโลเมตร)</IonLabel>
+            <IonNote slot = "end" color = "primary">{distance}</IonNote>
           </IonItem>
       
       </IonContent>
